@@ -1,0 +1,10 @@
+burp/plugs/info/InfoFound2JS.class
+burp/plugs/info/AKSKFoundForJS.class
+burp/plugs/info/DOMXSSCheck.class
+burp/plugs/info/SensitiveDataExpose.class
+burp/plugs/info/AKSKFoundForJS$1.class
+burp/utils/ScanItem.class
+burp/BurpExtender.class
+burp/plugs/info/Framework2Identify.class
+burp/utils/VulnIssue.class
+burp/plugs/info/WeakSpotParam.class
