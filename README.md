@@ -45,7 +45,9 @@ BurpSuite完全被动扫描插件，不主动发送任何请求，适合挂机�
 流量日志存储相关
 
 <img width="200" alt="image" src="https://user-images.githubusercontent.com/12745454/178136972-021d5516-b648-4b5b-9a06-b8713466b68e.png">
-<img width="990" alt="image" src="https://user-images.githubusercontent.com/12745454/178136992-2e310d74-a9be-4284-b51d-4ea72f0a74a0.png">
+<img width="975" alt="image" src="https://user-images.githubusercontent.com/12745454/178153825-a57c0ee0-7567-48b5-96b3-b1bcc3e58498.png">
+<img width="216" alt="image" src="https://user-images.githubusercontent.com/12745454/178153832-c12bff87-1776-43a5-8af8-62980b76452a.png">
+
 
 
 
