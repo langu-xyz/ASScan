@@ -29,10 +29,22 @@ public class BurpFuncTest {
 
 
     public static void main(String[] args) throws Exception {
-        String dbUrl = "jdbc:sqlite://Users/test/4-GitHub/ASCenter/EASM/db.sqlite3";
+        //String dbUrl = "jdbc:sqlite://Users/test/4-GitHub/ASCenter/EASM/db.sqlite3";
 
-        BurpFuncTest burpFuncTest = new BurpFuncTest();
+        //BurpFuncTest burpFuncTest = new BurpFuncTest();
 
-        burpFuncTest.BurpFuncTest(dbUrl);
-    }
+        //burpFuncTest.BurpFuncTest(dbUrl);
+
+        String sensInfo = "num:5:null";
+
+        System.out.println((sensInfo.split(":").length == 2) & (sensInfo.split(":")[sensInfo.split(":").length-1].length() > 8));
+        System.out.println(sensInfo.split(":")[sensInfo.split(":").length-1].length());
+
+        if ((sensInfo.split(":").length == 2) & (sensInfo.split(":")[sensInfo.split(":").length-1].length() > 8)){
+            System.out.println(sensInfo.split(":").length);
+            System.out.println(sensInfo.split(":")[sensInfo.split(":").length-1].length());
+        }
+
+        }
+
 }

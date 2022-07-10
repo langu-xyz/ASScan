@@ -13,8 +13,6 @@ public class WeakSpotParam {
     public HashMap<String, String> paramAnalyse(String name, String value){
         //{'name':'', value:'','as':['xss', 'ssrf', 'idor]}
         HashMap<String, String> result = new HashMap<>();
-        result.put("name", name);
-        result.put("value", value);
 
         List<String> as = new ArrayList();
 
@@ -28,6 +26,8 @@ public class WeakSpotParam {
         }
 
         if (!as.isEmpty()){
+            result.put("name", name);
+            result.put("value", value);
             result.put("as", String.valueOf(as));
         }
 

@@ -58,7 +58,7 @@ class ActivityHttpListener implements IHttpListener, IScannerListener {
                     if (ConfigMenu.INCLUDE_HTTP_RESPONSE_CONTENT) {
                         responseInfo = messageInfo.getResponse();
                     }
-                    this.activityLogger.logEvent(toolFlag, reqInfo, messageInfo.getRequest(), statusCode, responseInfo);
+                    this.activityLogger.logEvent(toolFlag, reqInfo, messageInfo.getRequest(), responseInfoStatusCode, responseInfo);
                 }
             }
         } catch (Exception e) {

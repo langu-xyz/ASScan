@@ -11,6 +11,9 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Handle the recording of the activities into the real storage, SQLite local DB here.
@@ -20,15 +23,15 @@ public class ActivityLogger implements IExtensionStateListener {
     /**
      * SQL instructions.
      */
-    private static final String SQL_TABLE_CREATE = "CREATE TABLE IF NOT EXISTS ACTIVITY (LOCAL_SOURCE_IP TEXT, TARGET_URL TEXT, HTTP_METHOD TEXT, BURP_TOOL TEXT, REQUEST_RAW TEXT, SEND_DATETIME TEXT, HTTP_STATUS_CODE TEXT, RESPONSE_RAW TEXT)";
-    private static final String SQL_TABLE_INSERT = "INSERT INTO ACTIVITY (LOCAL_SOURCE_IP,TARGET_URL,HTTP_METHOD,BURP_TOOL,REQUEST_RAW,SEND_DATETIME,HTTP_STATUS_CODE,RESPONSE_RAW) VALUES(?,?,?,?,?,?,?,?)";
-    private static final String SQL_COUNT_RECORDS = "SELECT COUNT(HTTP_METHOD) FROM ACTIVITY";
-    private static final String SQL_TOTAL_AMOUNT_DATA_SENT = "SELECT TOTAL(LENGTH(REQUEST_RAW)) FROM ACTIVITY";
-    private static final String SQL_BIGGEST_REQUEST_AMOUNT_DATA_SENT = "SELECT MAX(LENGTH(REQUEST_RAW)) FROM ACTIVITY";
-    private static final String SQL_MAX_HITS_BY_SECOND = "SELECT COUNT(REQUEST_RAW) AS HITS, SEND_DATETIME FROM ACTIVITY GROUP BY SEND_DATETIME ORDER BY HITS DESC";
+    private static final String SQL_TABLE_CREATE = "CREATE TABLE IF NOT EXISTS BURP_LOG (HOST TEXT, TARGET_URL TEXT, HTTP_METHOD TEXT, COOKIE TEXT, REFERER TEXT, UA TEXT,REQUEST_RAW TEXT, SEND_DATETIME TEXT, CONTENT_TYPE TEXT, MIME_TYPE TEXT, STATUS_CODE TEXT,RESPONSE_RAW TEXT)";
+    private static final String SQL_TABLE_INSERT = "INSERT INTO BURP_LOG (HOST,TARGET_URL,HTTP_METHOD,COOKIE,REFERER,UA, REQUEST_RAW,SEND_DATETIME,CONTENT_TYPE,MIME_TYPE,STATUS_CODE, RESPONSE_RAW) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)";
+    private static final String SQL_COUNT_RECORDS = "SELECT COUNT(HTTP_METHOD) FROM BURP_LOG";
+    private static final String SQL_TOTAL_AMOUNT_DATA_SENT = "SELECT TOTAL(LENGTH(REQUEST_RAW)) FROM BURP_LOG";
+    private static final String SQL_BIGGEST_REQUEST_AMOUNT_DATA_SENT = "SELECT MAX(LENGTH(REQUEST_RAW)) FROM BURP_LOG";
+    private static final String SQL_MAX_HITS_BY_SECOND = "SELECT COUNT(REQUEST_RAW) AS HITS, SEND_DATETIME FROM BURP_LOG GROUP BY SEND_DATETIME ORDER BY HITS DESC";
 
     private static final String SQL_ISSUES_TABLE_CREATE = "CREATE TABLE IF NOT EXISTS ISSUES (httpService TEXT, url TEXT, httpMessages TEXT, name TEXT, detail TEXT, severity TEXT)";
-    private static final String SQL_ISSUES_TABLE_INSERT = "INSERT INTO ACTIVITY (httpService, url, httpMessages, name, detail, severity) VALUES(?,?,?,?,?,?)";
+    private static final String SQL_ISSUES_TABLE_INSERT = "INSERT INTO ISSUES (httpService, url, httpMessages, name, detail, severity) VALUES(?,?,?,?,?,?)";
 
 
     /**
@@ -113,24 +116,44 @@ public class ActivityLogger implements IExtensionStateListener {
      * @param reqContent Raw content of the request.
      * @throws Exception If event cannot be saved.
      */
-    public void logEvent(int toolFlag, IRequestInfo reqInfo, byte[] reqContent, String statusCode, byte[] resContent) throws Exception {
+    public void logEvent(int toolFlag, IRequestInfo reqInfo, byte[] reqContent, IResponseInfo resInfo, byte[] resContent) throws Exception {
         //Verify that the DB connection is still opened
         this.ensureDBState();
+
+
         //Insert the event into the storage
         try (PreparedStatement stmt = this.storageConnection.prepareStatement(SQL_TABLE_INSERT)) {
-            stmt.setString(1, InetAddress.getLocalHost().getHostAddress());
+            stmt.setString(1, reqInfo.getUrl().getHost());
             stmt.setString(2, reqInfo.getUrl().toString());
             stmt.setString(3, reqInfo.getMethod());
-            stmt.setString(4, callbacks.getToolName(toolFlag));
-            stmt.setString(5, callbacks.getHelpers().bytesToString(reqContent));
-            stmt.setString(6, LocalDateTime.now().format(this.datetimeFormatter));
-            stmt.setString(7, statusCode);
-            stmt.setString(8, (resContent != null) ? callbacks.getHelpers().bytesToString(resContent) : EMPTY_RESPONSE_CONTENT);
+            stmt.setString(4, getHeaders(reqInfo).get("Cookie"));
+            stmt.setString(5, getHeaders(reqInfo).get("Referer"));
+            stmt.setString(6, getHeaders(reqInfo).get("User-Agent"));
+            stmt.setString(7, callbacks.getHelpers().bytesToString(reqContent));
+            stmt.setString(8, LocalDateTime.now().format(this.datetimeFormatter));
+            stmt.setString(9, String.valueOf(reqInfo.getContentType()));
+            stmt.setString(10, resInfo.getStatedMimeType());
+            stmt.setString(11, String.valueOf(resInfo.getStatusCode()));
+            stmt.setString(12, (resContent != null) ? callbacks.getHelpers().bytesToString(resContent) : EMPTY_RESPONSE_CONTENT);
             int count = stmt.executeUpdate();
             if (count != 1) {
                 this.trace.writeLog("Request was not inserted, no detail available (insertion counter = " + count + ") !");
             }
         }
+    }
+
+    private Map<String, String> getHeaders(IRequestInfo iRequestInfo){
+        Map<String, String> headers = new HashMap<>();
+        List<String> headerList = iRequestInfo.getHeaders();
+        for (String header: headerList){
+            if (header.startsWith("GET") || header.startsWith("POST")) {
+                continue;
+            } else {
+                String[] headerValue = header.split(":", 2);
+                headers.put(headerValue[0], headerValue[1].trim());
+            }
+        }
+        return headers;
     }
 
 

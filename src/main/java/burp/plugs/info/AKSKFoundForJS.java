@@ -30,8 +30,11 @@ public class AKSKFoundForJS {
                 }
             }
             for (String sensInfo : sensInfoList){
-                sensInfoMap.put(sensInfo, regex.getKey());
-                //前边为值，后边为类型
+                if ((sensInfo.split(":").length == 2) & (sensInfo.split(":")[sensInfo.split(":").length-1].length() > 8)){
+                    sensInfoMap.put(sensInfo, regex.getKey());
+                    //前边为值，后边为类型
+                }
+
             }
         }
 

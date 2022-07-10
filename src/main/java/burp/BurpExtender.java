@@ -193,8 +193,9 @@ public class BurpExtender implements IBurpExtender, IScannerCheck   {
 
                         WeakSpotParam weakSpotParam = new WeakSpotParam();
                         HashMap<String, String> weakSpotParamResult = weakSpotParam.paramAnalyse(iParameter.getName(), iParameter.getValue());
-
-                        iScanIssues.add(new VulnIssue(iHttpRequestResponse.getHttpService(), baseHttpRequestUrl, new IHttpRequestResponse[]{iHttpRequestResponse}, weakSpotParamResult.get("name") + ":" + weakSpotParamResult.get("value") + ":" + weakSpotParamResult.get("as"), weakSpotParamResult.get("as"), "Medium"));
+                        if (!weakSpotParamResult.isEmpty()){
+                            iScanIssues.add(new VulnIssue(iHttpRequestResponse.getHttpService(), baseHttpRequestUrl, new IHttpRequestResponse[]{iHttpRequestResponse}, weakSpotParamResult.get("as") + ":" + weakSpotParamResult.get("name") + ":" + weakSpotParamResult.get("value"), weakSpotParamResult.get("as"), "Medium"));
+                        }
                     }
                 }
             }
