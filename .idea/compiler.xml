@@ -7,6 +7,8 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="ASScan" />
+        <module name="ASScan 2" />
+        <module name="ASScan3" />
       </profile>
     </annotationProcessing>
   </component>
